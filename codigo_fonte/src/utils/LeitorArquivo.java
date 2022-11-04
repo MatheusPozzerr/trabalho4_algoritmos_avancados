@@ -8,11 +8,10 @@ import java.util.regex.Pattern;
 
 import dominio.Cidade;
 
-
 public class LeitorArquivo {
     public static Cidade[] leArquivo(String nomeArquivo) {
         String pathToFile = Paths.get(nomeArquivo).toString();
-        Pattern pattern = Pattern.compile(".*(\\d+\\.\\d+)\\s+(\\d+\\.\\d+)\\s+(\\w+).*");
+        //Pattern pattern = Pattern.compile(".*(\\d+\\.\\d+)\\s+(\\d+\\.\\d+)\\s+(\\w+).*");
         Cidade[] cidades = null;
         try(BufferedReader fileReader = new BufferedReader(new FileReader(pathToFile))) {
             String linha;
@@ -24,12 +23,11 @@ public class LeitorArquivo {
                     int n = Integer.parseInt(linha);
                     cidades = new Cidade[n];
                 } else {
-                    Matcher matcher = pattern.matcher(linha);
-                    if(matcher.matches()){
-                        Cidade cidade = new Cidade(Float.parseFloat(matcher.group(1)), Float.parseFloat(matcher.group(2)), matcher.group(3));
+                    String[] variaveisCidade = linha.split(" ");
+                    //Matcher matcher = pattern.matcher(linha);
+                        Cidade cidade = new Cidade(Float.parseFloat(variaveisCidade[0]), Float.parseFloat(variaveisCidade[1]), variaveisCidade[2]);
                         cidades[numeroLinha-1] = cidade;
                         numeroLinha++;
-                    }
                 }
             }
         } catch(NumberFormatException ex) {

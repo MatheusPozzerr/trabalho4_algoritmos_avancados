@@ -26,29 +26,30 @@ public class Algoritmo {
         int numGeracoes = 0;
         Populacao populacaoAtual = Populacao.geraPopulacao(tamanhoPopulacao, cidadesVovo.length);
 
-        while(true) {
+        while (true) {
             for (Individuo individuo : populacaoAtual.getIndividuos()) {
                 calculaAptidao(individuo);
             }
+            System.out.println("Estou aqui");
             printaPopulacao(populacaoAtual, numGeracoes, false);
 
-            if(numGeracoes == numMaxGeracoes) {
+            if (numGeracoes == numMaxGeracoes) {
                 System.out.println("Numero maximo de geracoes foi alcancado");
-                printaParesFinais(populacaoAtual);
+                printaCidadesFinais(populacaoAtual);
                 break;
             }
-            if(numGeracoes != 0 && verificaConvergencia(populacaoAtual)) {
+            if (numGeracoes != 0 && verificaConvergencia(populacaoAtual)) {
                 System.out.println("Populacao atual alcancou convergencia de 95%");
-                printaParesFinais(populacaoAtual);
+                printaCidadesFinais(populacaoAtual);
                 break;
             }
 
             Populacao populacaoIntermediaria = new Populacao(tamanhoPopulacao, cidadesVovo.length);
 
-            if(elitismo) {
+            if (elitismo) {
                 System.out.println("----------Inicio elitismo------------");
                 populacaoIntermediaria.getIndividuos()[0] = Selecao.elitismo(populacaoAtual);
-                printaPopulacao(populacaoIntermediaria, numGeracoes, true);
+                // printaPopulacao(populacaoIntermediaria, numGeracoes, true);
                 System.out.println("----------Fim elitismo------------");
             }
 
@@ -66,16 +67,15 @@ public class Algoritmo {
                     populacaoIntermediaria.getIndividuos()[i] = filhos[0];
                     populacaoIntermediaria.getIndividuos()[i + 1] = filhos[1];
 
-                    printaPopulacao(populacaoIntermediaria, numGeracoes, true);
+                    // printaPopulacao(populacaoIntermediaria, numGeracoes, true);
                     System.out.println("----------Fim crossover------------");
                 }
-            }
-            else {
+            } else {
                 System.out.println("----------Pulando etapa de crossover devido a taxa------------");
                 for (int i = indiceCrossover; i < populacaoIntermediaria.getIndividuos().length; i++) {
                     populacaoIntermediaria.getIndividuos()[i] = populacaoAtual.getIndividuos()[i];
                 }
-                printaPopulacao(populacaoIntermediaria, numGeracoes, true);
+                // printaPopulacao(populacaoIntermediaria, numGeracoes, true);
                 System.out.println("----------Fim selecao------------");
             }
 
@@ -83,10 +83,9 @@ public class Algoritmo {
             if ((valorCorteMutacao / 100.0) < taxaDeMutacao) {
                 System.out.println("----------Inicio mutacao------------");
                 Mutacao.mutacao(populacaoIntermediaria);
-                printaPopulacao(populacaoIntermediaria, numGeracoes, true);
+                // printaPopulacao(populacaoIntermediaria, numGeracoes, true);
                 System.out.println("----------Fim mutacao------------");
-            }
-            else {
+            } else {
                 System.out.println("----------Pulando etapa de mutacao devido a taxa------------");
             }
 
@@ -98,9 +97,15 @@ public class Algoritmo {
     private void calculaAptidao(Individuo individuo) {
         float distanciaCaminho = 0;
         CalculaDistancia calculaDistancia = new CalculaDistancia();
-        for (int i = 0; individuo.getNumeroCidade().length < i; i++) {
-            distanciaCaminho += calculaDistancia.calculaDistanciaCidades(cidadesVovo[individuo.getNumeroCidade()[i]],
-                    cidadesVovo[individuo.getNumeroCidade()[i + 1]]);
+        for (int i = 0; individuo.getNumeroCidade().length > i; i++) {
+            if (i == individuo.getNumeroCidade().length - 1) {
+                distanciaCaminho += calculaDistancia.calculaDistanciaCidades(
+                        cidadesVovo[individuo.getNumeroCidade()[0]],
+                        cidadesVovo[individuo.getNumeroCidade()[individuo.getNumeroCidade().length - 1]]);
+            } else {
+                distanciaCaminho = calculaDistancia.calculaDistanciaCidades(cidadesVovo[individuo.getNumeroCidade()[i]],
+                        cidadesVovo[individuo.getNumeroCidade()[i + 1]]) + distanciaCaminho;
+            }
         }
         distanciaCaminho += calculaDistancia.calculaDistanciaCidades(cidadesVovo[individuo.getNumeroCidade()[0]],
                 cidadesVovo[individuo.getNumeroCidade()[individuo.getNumeroCidade().length - 1]]);
@@ -170,7 +175,7 @@ public class Algoritmo {
         System.out.println();
     }
 
-    private void printaParesFinais(Populacao populacao) {
+    private void printaCidadesFinais(Populacao populacao) {
         int indiceMelhorAptidao = 0;
         for (int i = 1; i < populacao.getIndividuos().length; i++) {
             if (populacao.getIndividuos()[i].getAptidao() < populacao.getIndividuos()[indiceMelhorAptidao]
@@ -179,10 +184,10 @@ public class Algoritmo {
             }
         }
 
-        int[] melhoresPares = populacao.getIndividuos()[indiceMelhorAptidao].getNumeroCidade();
-        System.out.println("Pares:");
-        for (int i = 0; i < melhoresPares.length; i++) {
-            System.out.println("Aluno " + (i + 1) + " da manha forma par com aluno " + melhoresPares[i] + " da tarde");
+        int[] melhorCidade = populacao.getIndividuos()[indiceMelhorAptidao].getNumeroCidade();
+        System.out.println("Melhor caminho: ");
+        for (int i = 0; i < melhorCidade.length; i++) {
+            System.out.print(melhorCidade[i] + " - ");
         }
     }
 }
