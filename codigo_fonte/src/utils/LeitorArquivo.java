@@ -11,7 +11,7 @@ import dominio.Cidade;
 public class LeitorArquivo {
     public static Cidade[] leArquivo(String nomeArquivo) {
         String pathToFile = Paths.get(nomeArquivo).toString();
-        //Pattern pattern = Pattern.compile(".*(\\d+\\.\\d+)\\s+(\\d+\\.\\d+)\\s+(\\w+).*");
+        //Pattern pattern = Pattern.compile(".*(\\d+(?:\\.\\d+)?)\\s+(\\d+(?:\\.\\d+)?)\\s+(\\w+).*");
         Cidade[] cidades = null;
         try(BufferedReader fileReader = new BufferedReader(new FileReader(pathToFile))) {
             String linha;

@@ -31,7 +31,8 @@ public class Algoritmo {
                 calculaAptidao(individuo);
             }
             System.out.println("Estou aqui");
-            printaPopulacao(populacaoAtual, numGeracoes, false);
+            //printaPopulacao(populacaoAtual, numGeracoes, false);
+            printaAptidao(populacaoAtual, numGeracoes, false);
 
             if (numGeracoes == numMaxGeracoes) {
                 System.out.println("Numero maximo de geracoes foi alcancado");
@@ -99,6 +100,7 @@ public class Algoritmo {
         CalculaDistancia calculaDistancia = new CalculaDistancia();
         for (int i = 0; individuo.getNumeroCidade().length > i; i++) {
             if (i == individuo.getNumeroCidade().length - 1) {
+                System.out.println("Entrei aqui: "  + i);
                 distanciaCaminho += calculaDistancia.calculaDistanciaCidades(
                         cidadesVovo[individuo.getNumeroCidade()[0]],
                         cidadesVovo[individuo.getNumeroCidade()[individuo.getNumeroCidade().length - 1]]);
@@ -175,6 +177,22 @@ public class Algoritmo {
         System.out.println();
     }
 
+    private void printaAptidao(Populacao populacao, int numGeracoes, boolean intermediaria) {
+        System.out.println();
+        if (numGeracoes == 0)
+            System.out.println("Populacao inicial:");
+        else if (!intermediaria)
+            System.out.println("Geracao " + numGeracoes + ":");
+        for (int i = 0; i < populacao.getIndividuos().length; i++) {
+            Individuo individuo = populacao.getIndividuos()[i];
+            if (!intermediaria)
+                System.out.println(" -> APTIDAO: " + individuo.getAptidao());
+            else
+                System.out.println();
+        }
+        System.out.println();
+    }
+
     private void printaCidadesFinais(Populacao populacao) {
         int indiceMelhorAptidao = 0;
         for (int i = 1; i < populacao.getIndividuos().length; i++) {
@@ -187,7 +205,10 @@ public class Algoritmo {
         int[] melhorCidade = populacao.getIndividuos()[indiceMelhorAptidao].getNumeroCidade();
         System.out.println("Melhor caminho: ");
         for (int i = 0; i < melhorCidade.length; i++) {
-            System.out.print(melhorCidade[i] + " - ");
+            if(i == melhorCidade.length - 1){
+                System.out.print(melhorCidade[i]);
+            }
+            System.out.print(melhorCidade[i] + " -> ");
         }
     }
 }
