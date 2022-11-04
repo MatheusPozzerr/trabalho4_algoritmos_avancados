@@ -12,11 +12,12 @@ public class Algoritmo {
     private static final Random random = new Random();
     private double taxaDeCrossover = 0.9;
     private double taxaDeMutacao = 0.1;
-    private int numMaxGeracoes = 100;
+    private int numMaxGeracoes = 1000000;
     private int tamanhoPopulacao = 9;
     private boolean elitismo = true;
     private Cidade[] cidadesVovo;
-    // private HashMap<Float, Integer> hash_map = new HashMap<Float, Integer>();
+    private float melhorAptidao = Float.MAX_VALUE;
+    private int contadorConvergencia = 0;
 
     public Algoritmo(Cidade[] cidadesVovo) {
         this.cidadesVovo = cidadesVovo;
@@ -30,9 +31,10 @@ public class Algoritmo {
             for (Individuo individuo : populacaoAtual.getIndividuos()) {
                 calculaAptidao(individuo);
             }
-            System.out.println("Estou aqui");
-            //printaPopulacao(populacaoAtual, numGeracoes, false);
-            printaAptidao(populacaoAtual, numGeracoes, false);
+            // printaPopulacao(populacaoAtual, numGeracoes, false);
+            if (numGeracoes % 10 == 0) {
+                printaAptidao(populacaoAtual, numGeracoes, false);
+            }
 
             if (numGeracoes == numMaxGeracoes) {
                 System.out.println("Numero maximo de geracoes foi alcancado");
@@ -40,7 +42,7 @@ public class Algoritmo {
                 break;
             }
             if (numGeracoes != 0 && verificaConvergencia(populacaoAtual)) {
-                System.out.println("Populacao atual alcancou convergencia de 95%");
+                System.out.println("Populacao atual alcancou convergencia de 90% e se repetiu em 1000 gerações");
                 printaCidadesFinais(populacaoAtual);
                 break;
             }
@@ -48,48 +50,38 @@ public class Algoritmo {
             Populacao populacaoIntermediaria = new Populacao(tamanhoPopulacao, cidadesVovo.length);
 
             if (elitismo) {
-                System.out.println("----------Inicio elitismo------------");
+                //Elitismo
                 populacaoIntermediaria.getIndividuos()[0] = Selecao.elitismo(populacaoAtual);
-                // printaPopulacao(populacaoIntermediaria, numGeracoes, true);
-                System.out.println("----------Fim elitismo------------");
+                // System.out.println("----------Fim Elitismo------------");
             }
 
             int indiceCrossover = elitismo ? 1 : 0;
             int valorCorteCrossover = random.nextInt(100);
             if ((valorCorteCrossover / 100.0) < taxaDeCrossover) {
                 List<Individuo> individuosDisponiveis = new ArrayList<>(Arrays.asList(populacaoAtual.getIndividuos()));
-                System.out.println("----------Inicio torneios e crossovers------------");
                 for (int i = indiceCrossover; i < populacaoIntermediaria.getIndividuos().length; i += 2) {
                     Individuo pai1 = Selecao.torneio(individuosDisponiveis);
                     Individuo pai2 = Selecao.torneio(individuosDisponiveis);
-                    System.out.println("----------Fim torneio------------");
                     // crossover PBX
                     Individuo[] filhos = Crossover.PBX(pai1, pai2);
                     populacaoIntermediaria.getIndividuos()[i] = filhos[0];
                     populacaoIntermediaria.getIndividuos()[i + 1] = filhos[1];
-
-                    // printaPopulacao(populacaoIntermediaria, numGeracoes, true);
-                    System.out.println("----------Fim crossover------------");
+                    // System.out.println("----------Fim crossover------------");
                 }
             } else {
-                System.out.println("----------Pulando etapa de crossover devido a taxa------------");
                 for (int i = indiceCrossover; i < populacaoIntermediaria.getIndividuos().length; i++) {
                     populacaoIntermediaria.getIndividuos()[i] = populacaoAtual.getIndividuos()[i];
                 }
-                // printaPopulacao(populacaoIntermediaria, numGeracoes, true);
-                System.out.println("----------Fim selecao------------");
+                // System.out.println("----------Fim selecao------------");
             }
 
             int valorCorteMutacao = random.nextInt(100);
             if ((valorCorteMutacao / 100.0) < taxaDeMutacao) {
-                System.out.println("----------Inicio mutacao------------");
+                // System.out.println("----------Inicio mutacao------------");
                 Mutacao.mutacao(populacaoIntermediaria);
                 // printaPopulacao(populacaoIntermediaria, numGeracoes, true);
-                System.out.println("----------Fim mutacao------------");
-            } else {
-                System.out.println("----------Pulando etapa de mutacao devido a taxa------------");
-            }
-
+                // System.out.println("----------Fim mutacao------------");
+            } 
             populacaoAtual = populacaoIntermediaria;
             numGeracoes++;
         }
@@ -100,7 +92,6 @@ public class Algoritmo {
         CalculaDistancia calculaDistancia = new CalculaDistancia();
         for (int i = 0; individuo.getNumeroCidade().length > i; i++) {
             if (i == individuo.getNumeroCidade().length - 1) {
-                System.out.println("Entrei aqui: "  + i);
                 distanciaCaminho += calculaDistancia.calculaDistanciaCidades(
                         cidadesVovo[individuo.getNumeroCidade()[0]],
                         cidadesVovo[individuo.getNumeroCidade()[individuo.getNumeroCidade().length - 1]]);
@@ -114,26 +105,9 @@ public class Algoritmo {
         individuo.setAptidao(distanciaCaminho);
     }
 
-    // private boolean encontrouSolucao(Populacao populacao) {
-
-    // for (int i = 0; i < populacao.getIndividuos().length; i++) {
-    // hash_map.put(populacao.getIndividuos()[i].getAptidao(),
-    // hash_map.get(populacao.getIndividuos()[i].getAptidao()) != null
-    // ? hash_map.get(populacao.getIndividuos()[i].getAptidao()) + 1
-    // : 1);
-    // }
-    // for (Entry<Float, Integer> entry : hash_map.entrySet()) {
-    // if ((float) entry.getValue() / (float) populacao.getIndividuos().length >=
-    // 0.9) {
-    // return true;
-    // }
-    // }
-    // return false;
-    // }
-
     private boolean verificaConvergencia(Populacao populacao) {
-        // Chave: resultado de aptidao
-        // Valor: numero de individuos
+        // Chave: resultado de aptidao(distancia)
+        // Valor: Quantidade de individuos com aptidao
         Map<Float, Integer> contagemPorAptidao = new HashMap<>();
         for (int i = 0; i < populacao.getIndividuos().length; i++) {
             float aptidaoAtual = (float) populacao.getIndividuos()[i].getAptidao();
@@ -155,42 +129,46 @@ public class Algoritmo {
         float solucaoAptidao = Collections.min(contagemPorAptidao.keySet());
 
         return (aptidaoConvergida.getValue() >= ((int) (0.90 * populacao.getIndividuos().length))) &&
-                (solucaoAptidao == aptidaoConvergida.getKey());
+                (solucaoAptidao == aptidaoConvergida.getKey()) && this.contadorConvergencia >= 1000;
     }
 
-    private void printaPopulacao(Populacao populacao, int numGeracoes, boolean intermediaria) {
-        System.out.println();
-        if (numGeracoes == 0)
-            System.out.println("Populacao inicial:");
-        else if (!intermediaria)
-            System.out.println("Geracao " + numGeracoes + ":");
-        for (int i = 0; i < populacao.getIndividuos().length; i++) {
-            Individuo individuo = populacao.getIndividuos()[i];
-            for (int j = 0; j < individuo.getNumeroCidade().length; j++) {
-                System.out.print(individuo.getNumeroCidade()[j] + " ");
-            }
-            if (!intermediaria)
-                System.out.println(" -> APTIDAO: " + individuo.getAptidao());
-            else
-                System.out.println();
-        }
-        System.out.println();
-    }
+    // private void printaPopulacao(Populacao populacao, int numGeracoes, boolean intermediaria) {
+    //     System.out.println();
+    //     if (numGeracoes == 0)
+    //         System.out.println("Populacao inicial:");
+    //     else if (!intermediaria)
+    //         System.out.println("Geracao " + numGeracoes + ":");
+    //     for (int i = 0; i < populacao.getIndividuos().length; i++) {
+    //         Individuo individuo = populacao.getIndividuos()[i];
+    //         for (int j = 0; j < individuo.getNumeroCidade().length; j++) {
+    //             System.out.print(individuo.getNumeroCidade()[j] + " ");
+    //         }
+    //         if (!intermediaria)
+    //             System.out.println(" -> APTIDAO: " + individuo.getAptidao());
+    //         else
+    //             System.out.println();
+    //     }
+    //     System.out.println();
+    // }
 
     private void printaAptidao(Populacao populacao, int numGeracoes, boolean intermediaria) {
-        System.out.println();
-        if (numGeracoes == 0)
-            System.out.println("Populacao inicial:");
-        else if (!intermediaria)
-            System.out.println("Geracao " + numGeracoes + ":");
+        if (!intermediaria)
+            System.out.print("Geracao " + numGeracoes + ": ");
+        float checaAptidao = melhorAptidao;
         for (int i = 0; i < populacao.getIndividuos().length; i++) {
             Individuo individuo = populacao.getIndividuos()[i];
-            if (!intermediaria)
-                System.out.println(" -> APTIDAO: " + individuo.getAptidao());
-            else
-                System.out.println();
+            if (individuo.getAptidao() < melhorAptidao) {
+                melhorAptidao = individuo.getAptidao();
+            }
         }
-        System.out.println();
+        if (melhorAptidao < checaAptidao) {
+            System.out.println("Novo melhor caminho encontrado: " + melhorAptidao);
+            this.contadorConvergencia = 0;
+        }
+        else{
+            System.out.println("Caminho melhor não encontrado");
+            this.contadorConvergencia = this.contadorConvergencia + 10;
+        }
     }
 
     private void printaCidadesFinais(Populacao populacao) {
@@ -203,12 +181,13 @@ public class Algoritmo {
         }
 
         int[] melhorCidade = populacao.getIndividuos()[indiceMelhorAptidao].getNumeroCidade();
-        System.out.println("Melhor caminho: ");
+        System.out.println("Melhor caminho: " + melhorAptidao);
         for (int i = 0; i < melhorCidade.length; i++) {
-            if(i == melhorCidade.length - 1){
+            if (i == melhorCidade.length - 1) {
                 System.out.print(melhorCidade[i]);
             }
             System.out.print(melhorCidade[i] + " -> ");
         }
+        System.out.println();
     }
 }

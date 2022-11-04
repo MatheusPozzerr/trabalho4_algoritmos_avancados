@@ -21,8 +21,8 @@ public class Mutacao {
                 posicao2 = random.nextInt(individuoSelecionado.getNumeroCidade().length);
             }
 
-            System.out.println("Cromossomo " + individuoIndice + " sofreu mutacao nas cargas de indices "
-                    + posicao1 + " e " + posicao2);
+            // System.out.println("Cromossomo " + individuoIndice + " sofreu mutacao nas cargas de indices "
+            //        + posicao1 + " e " + posicao2);
             // Swap
             int aux = individuoSelecionado.getNumeroCidade()[posicao1];
             individuoSelecionado.getNumeroCidade()[posicao1] = individuoSelecionado.getNumeroCidade()[posicao2];

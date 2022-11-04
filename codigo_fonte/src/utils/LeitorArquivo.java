@@ -3,8 +3,6 @@ package utils;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.nio.file.Paths;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import dominio.Cidade;
 
