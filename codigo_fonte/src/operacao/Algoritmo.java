@@ -11,7 +11,7 @@ import java.util.Map.Entry;
 public class Algoritmo {
     private static final Random random = new Random();
     private double taxaDeCrossover = 0.9;
-    private double taxaDeMutacao = 0.1;
+    private double taxaDeMutacao = 0.10;
     private int numMaxGeracoes = 1000000;
     private int tamanhoPopulacao = 9;
     private boolean elitismo = true;
@@ -32,7 +32,7 @@ public class Algoritmo {
                 calculaAptidao(individuo);
             }
             // printaPopulacao(populacaoAtual, numGeracoes, false);
-            if (numGeracoes % 10 == 0) {
+            if (numGeracoes % 100 == 0) {
                 printaAptidao(populacaoAtual, numGeracoes, false);
             }
 
@@ -42,7 +42,7 @@ public class Algoritmo {
                 break;
             }
             if (numGeracoes != 0 && verificaConvergencia(populacaoAtual)) {
-                System.out.println("Populacao atual alcancou convergencia de 90% e se repetiu em 1000 gerações");
+                System.out.println("Populacao atual alcancou convergencia de 90% e se repetiu em 10000 geracões");
                 printaCidadesFinais(populacaoAtual);
                 break;
             }
@@ -129,7 +129,7 @@ public class Algoritmo {
         float solucaoAptidao = Collections.min(contagemPorAptidao.keySet());
 
         return (aptidaoConvergida.getValue() >= ((int) (0.90 * populacao.getIndividuos().length))) &&
-                (solucaoAptidao == aptidaoConvergida.getKey()) && this.contadorConvergencia >= 1000;
+                (solucaoAptidao == aptidaoConvergida.getKey()) && this.contadorConvergencia >= 30000;
     }
 
     // private void printaPopulacao(Populacao populacao, int numGeracoes, boolean intermediaria) {
@@ -166,8 +166,8 @@ public class Algoritmo {
             this.contadorConvergencia = 0;
         }
         else{
-            System.out.println("Caminho melhor não encontrado");
-            this.contadorConvergencia = this.contadorConvergencia + 10;
+            System.out.println("Caminho melhor nao encontrado");
+            this.contadorConvergencia = this.contadorConvergencia + 100;
         }
     }
 
