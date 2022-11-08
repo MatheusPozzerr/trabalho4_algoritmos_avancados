@@ -31,7 +31,7 @@ public class Algoritmo {
                 break;
             }
 
-            individuo = this.mutacao(individuo);
+            individuo = this.mutacao(individuo, numGeracoes);
             numGeracoes++;
         }
     }
@@ -67,7 +67,7 @@ public class Algoritmo {
         return individuoInicial;
     }
 
-    private Individuo mutacao(Individuo individuo) {
+    private Individuo mutacao(Individuo individuo, int numGeracoes) {
         Individuo verificaMutacao = new Individuo(individuo.getNumeroCidade().length);
         for(int i = 0; i <individuo.getNumeroCidade().length; i++){
             verificaMutacao.getNumeroCidade()[i] = individuo.getNumeroCidade()[i];
@@ -82,7 +82,7 @@ public class Algoritmo {
         verificaMutacao.getNumeroCidade()[posicao2] = aux;
         calculaAptidao(verificaMutacao);
         if(verificaMutacao.getAptidao() < melhorAptidao){
-            System.out.println("Novo melhor caminho encontrado: " + verificaMutacao.getAptidao());
+            System.out.println("Novo melhor caminho encontrado: " + verificaMutacao.getAptidao() + "; Geracao: " + numGeracoes);
             melhorAptidao = verificaMutacao.getAptidao();
             return verificaMutacao;
         }
